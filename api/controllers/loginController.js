@@ -1,6 +1,12 @@
 // khoi tao const de  su dung duoc cac lenh ma mysql cung cap cho node
 const mysql = require('mysql');
 
+const LocalStrategy = require('passport-local').Strategy;
+
+const cookieSession = require('cookie-session');
+
+const bodyParser = require('body-parser');
+
 // khoi tao express
 const express = require('express');
 
@@ -12,6 +18,12 @@ var mysqlConnection = mysql.createConnection({
     port: "3306",
     database: "User"
 });
+
+app.use(cookieSession({
+    name: 'mysession',
+    keys: ['vueauthrandomkey'],
+    maxAge: 24 * 60 * 60 * 1000 // cai nay co tac dung trong 24h
+}))
 
 // check connection voi mysql
 mysqlConnection.connect((err) => {
