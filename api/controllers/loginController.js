@@ -1,6 +1,10 @@
+// khoi tao const de  su dung duoc cac lenh ma mysql cung cap cho node
 const mysql = require('mysql');
+
+// khoi tao express
 const express = require('express');
 
+// khoi tao connection voi database local
 var mysqlConnection = mysql.createConnection({
     host: "localhost",
     user: "root",
@@ -9,6 +13,7 @@ var mysqlConnection = mysql.createConnection({
     database: "User"
 });
 
+// check connection voi mysql
 mysqlConnection.connect((err) => {
     if (!err) {
         console.log('Connection successfully');
@@ -16,6 +21,7 @@ mysqlConnection.connect((err) => {
         console.log('Connection failed!' + JSON.stringify(err, undefined, 2));
 });
 
+// ham lay tat ca cac user
 exports.getUser = function(req, res) {
     var sqlq = `SELECT * 
                 FROM Users;`;
@@ -27,6 +33,7 @@ exports.getUser = function(req, res) {
     });
 };
 
+// ham login cho account
 exports.login = function(req, res) {
     if (!req.body.username || !req.body.password) {
         res.send('Login failed');
@@ -48,6 +55,8 @@ exports.login = function(req, res) {
             console.log(err);
     });
 };
+
+// ham get het tat cua user do
 exports.getTasks = function(req, res) {
     if (!req.body.username || !req.body.password) {
         res.send('Login failed');
