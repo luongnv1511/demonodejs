@@ -17,7 +17,9 @@ mysqlConnection.connect((err) => {
 });
 
 exports.getUser = function(req, res) {
-    mysqlConnection.query('SELECT * FROM Users;', (err, rows, fields) => {
+    var sqlq = `SELECT * 
+                FROM Users;`;
+    mysqlConnection.query(sqlq, (err, rows, fields) => {
         if (!err)
             res.send(rows);
         else
@@ -32,7 +34,9 @@ exports.login = function(req, res) {
     }
     var username = req.body.username;
     var password = req.body.password;
-    // var sqlq = 'SELECT * FROM Users WHERE username = "' + username + '" and password = "' + password + '";';
+    var sqlq = `SELECT * 
+                FROM Users 
+                WHERE username = '${username}' and password = '${password}';`;
     mysqlConnection.query(sqlq, (err, rows, fields) => {
         if (!err) {
             if (rows.length > 0) {
@@ -51,10 +55,9 @@ exports.getTasks = function(req, res) {
     }
     var username = req.body.username;
     var password = req.body.password;
-    // var sqlq = 'SELECT * FROM Users WHERE username = "' + username + '" and password = "' + password + '";';
-    var sqlq = fs.readFile('../../sqlscript/getUsers.sql', function(err, data) {
-        return data;
-    });
+    var sqlq = `SELECT * 
+                FROM Tasks as t, Users as u
+                WHERE u.username = '${username}' and u.id = t.userid;`;
     mysqlConnection.query(sqlq, (err, rows, fields) => {
         if (!err) {
             if (rows.length > 0) {

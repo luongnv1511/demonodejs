@@ -17,4 +17,9 @@ module.exports = function(app) {
         .post(function(req, res) {
             loginController.login(req, res);
         });
+
+    app.route('/tasks')
+        .post(function(req, res) {
+            loginController.getTasks(req, res);
+        });
 }
