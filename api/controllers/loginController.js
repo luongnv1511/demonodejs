@@ -1,10 +1,13 @@
 // khoi tao const de  su dung duoc cac lenh ma mysql cung cap cho node
 const mysql = require('mysql');
 
+// khoi tao tat ca cai nay de lam authentication
 const LocalStrategy = require('passport-local').Strategy;
 
+// khi tao de xu li cac session
 const cookieSession = require('cookie-session');
 
+// parse cac request toi server
 const bodyParser = require('body-parser');
 
 // khoi tao express
@@ -24,6 +27,9 @@ app.use(cookieSession({
     keys: ['vueauthrandomkey'],
     maxAge: 24 * 60 * 60 * 1000 // cai nay co tac dung trong 24h
 }))
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // check connection voi mysql
 mysqlConnection.connect((err) => {
@@ -47,24 +53,26 @@ exports.getUser = function(req, res) {
 
 // ham login cho account
 exports.login = function(req, res) {
-    if (!req.body.username || !req.body.password) {
-        res.send('Login failed');
-        return;
-    }
-    var username = req.body.username;
-    var password = req.body.password;
-    var sqlq = `SELECT * 
-                FROM Users 
-                WHERE username = '${username}' and password = '${password}';`;
-    mysqlConnection.query(sqlq, (err, rows, fields) => {
-        if (!err) {
-            if (rows.length > 0) {
-                res.send('Login Success');
-            } else {
-                res.send('Login failed');
-            }
-        } else
-            console.log(err);
+    passport.authenticate('local', (err, req, res) => {
+        if (!req.body.username || !req.body.password) {
+            res.send('Login failed');
+            return;
+        }
+        var username = req.body.username;
+        var password = req.body.password;
+        var sqlq = `SELECT * 
+                    FROM Users 
+                    WHERE username = '${username}' and password = '${password}';`;
+        mysqlConnection.query(sqlq, (err, rows, fields) => {
+            if (!err) {
+                if (rows.length > 0) {
+                    res.send('Login Success');
+                } else {
+                    res.send('Login failed');
+                }
+            } else
+                console.log(err);
+        });
     });
 };
 
@@ -90,3 +98,11 @@ exports.getTasks = function(req, res) {
             console.log(err);
     });
 };
+
+const authMiddleware = (req, res, next) => {
+    if (!req.isAuthenticated()) {
+        res.status(401).send('You are not authenticated')
+    } else {
+        return next()
+    }
+}
